@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+{% block body %}
+<form class="form-signin" method="POST">
+    <h2 class="form-signin-heading">Please Register</h2>
+    <input type="username" class="form-control" placeholder="First Name" name="first_name" required autofocus />
+    <input type="username" class="form-control" placeholder="Last Name" name="last_name" required autofocus />
+    <input type="email" class="form-control" placeholder="Email Address" name="email" required autofocus />
+    <input type="password" class="form-control" placeholder="Password" name="password" required />
+    <button type="btn btn-lg btn-primary btn-block" type="submit">Submit</button>
+</form>
+{% endblock %}

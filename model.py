@@ -1,5 +1,6 @@
 import sqlite3
 
+
 class Melon(object):
     """A wrapper object that corresponds to rows in the melons table."""
     def __init__(self, id, melon_type, common_name, price, imgurl, flesh_color, rind_color, seedless):
@@ -19,16 +20,25 @@ class Melon(object):
         return "<Melon: %s, %s, %s>"%(self.id, self.common_name, self.price_str())
 
 class Customer(object):
-    pass
+    def __init__(self, id, first_name, last_name, email, password):
+      self.id = id
+      self.first_name = first_name
+      self.last_name = last_name
+      self.email = email
+      self.password = password
+
+    def display_name(self):
+        return "%s %s" % (first_name, last_name)
 
 def connect():
-    conn = sqlite3.connect("melons.db")
+    conn= sqlite3.connect("melons.db")
     cursor = conn.cursor()
-    return cursor
+    return (conn,cursor)
+
 
 def get_melons():
     """Query the database for the first 30 melons, wrap each row in a Melon object"""
-    cursor = connect()
+    cursor = connect()[1]
     query = """SELECT id, melon_type, common_name,
                       price, imgurl,
                       flesh_color, rind_color, seedless
@@ -47,13 +57,11 @@ def get_melons():
 
         melons.append(melon)
 
-    print melons
-
     return melons
 
 def get_melon_by_id(id):
     """Query for a specific melon in the database by the primary key"""
-    cursor = connect()
+    cursor = connect()[1] # connecting to SQLite
     query = """SELECT id, melon_type, common_name,
                       price, imgurl,
                       flesh_color, rind_color, seedless
@@ -73,4 +81,38 @@ def get_melon_by_id(id):
     return melon
 
 def get_customer_by_email(email):
-    pass
+    """Query for a specific customer in the database by email"""
+    cursor = connect()[1]
+    query = """SELECT id, givenname, surname, email, password
+               FROM customers
+               WHERE email = ?;"""
+
+    cursor.execute(query, (email,))
+
+    row = cursor.fetchone()
+
+    if not row:
+      return None
+
+    customer = Customer(row[0], row[1], row[2], row[3], row[4])
+
+    return customer
+
+def register_customer(first_name, last_name, email, password):
+    """Create a new customer in the database from user input"""
+    cursor = connect()[1]
+
+    query = """SELECT id
+               FROM customers
+               ORDER BY id DESC
+               LIMIT 1;"""
+
+    cursor.execute(query)
+    row = cursor.fetchone()
+
+    insert = """INSERT INTO customers (id, givenname, surname, email, password) VALUES (?, ?, ?, ?, ?)"""
+
+    cursor.execute(insert, (row[0]+1, first_name, last_name, email, hash(password)))
+    connect()[0].commit()
+
+    return True
