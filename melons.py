@@ -41,8 +41,10 @@ def shopping_cart():
         melon_dict[melon] = session["cart"][id]
         total_sum += melon.price*melon_dict[melon]
 
+    melon_list = melon_dict.items()
+    melon_list.sort(key=lambda melon: melon[0].common_name)
     return render_template("cart.html",
-                              cart = melon_dict,
+                              cart = melon_list,
                               total = "$%.2f" % total_sum)
 
     
@@ -139,8 +141,8 @@ def update():
     """TODO: Implement a payment system. For now, just return them to the main
     melon listing page."""
     for melon_id in session["cart"].keys():
-        if request.form.get(melon_id) != '':
-            session["cart"][melon_id] = int(request.form.get(melon_id))
+        if request.form.get("qty-%s" %melon_id) != '':
+            session["cart"][melon_id] = int(request.form.get("qty-%s" %melon_id))
     print session["cart"]
 
     return redirect("/cart")

@@ -5,13 +5,11 @@
 <table class="table table-striped">
     <tr><th>Melon Name</th><th>Quantity</th><th>Price</th><th>Total</th></tr>
 {% if cart %}
-    {% set melons = cart.keys() %}
-    {% set var = melons.sort() %}
-    {% for melon in melons %}
-    <tr><td>{{melon.common_name}}</td><td>{%set quantity = cart[melon]%}
-        <input type='text' name={{melon.id}} id={{melon.id}} placeholder= {{ quantity }}/>
-        <input type='button' name='add' onclick='javascript: document.getElementById({{melon.id}}).value++;' value='+'/>
-        <input type='button' name='subtract' onclick='javascript: document.getElementById({{melon.id}}).value--;' value='-'/></td><td>{{melon.price_str()}}</td><td>{{"$%.2f"%(cart[melon]*melon.price)}}</td></tr>
+    {% for melon, qty in cart %}
+    <tr><td>{{melon.common_name}}</td><td>        
+        <input type='text' class="qty-text" name="qty-{{melon.id}}" id="textbox-{{melon.id}}" value="{{ qty }}"/>
+        <input type='button' class="add-button" name='add' id='add-{{melon.id}}' value= '+'/>
+        <input type='button' class="sub-button" name='subtract' id='subtract-{{melon.id}}' value= '-'/></td><td>{{melon.price_str()}}</td><td>{{"$%.2f"%(qty*melon.price)}}</td></tr>
     {% endfor %}
 </table>
 <h3>Total: {{ total }}</h3>
@@ -20,5 +18,39 @@
 <a href="/checkout" class="btn btn-large btn-primary">Check Out</a>
 {% endif %}
 
+<script type="text/javascript">
+
+    function increase_melon_qty() {
+        var id = $(this).attr("id");
+        var melon_id = id.split("-")[1];
+
+        var new_val = parseInt($("input#textbox-" + melon_id).val()) + 1;
+
+        $("input#textbox-" + melon_id).val(new_val);
+    }
+
+    function decrease_melon_qty() {
+        var id = $(this).attr("id");
+        var melon_id = id.split("-")[1];
+
+        var new_val = parseInt($("input#textbox-" + melon_id).val()) - 1;
+
+        if (new_val > 0) {
+            $("input#textbox-" + melon_id).val(new_val);
+        }
+        else {
+            $("input#textbox-" + melon_id).val(0);   
+        }
+    }
+
+    function main() {
+        $("input.add-button").click(increase_melon_qty);
+        $("input.sub-button").click(decrease_melon_qty);
+    
+    }
+
+$(main);
+
+</script>
 
 {% endblock %}
