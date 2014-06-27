@@ -74,3 +74,16 @@ div.cart {
 img.melon-cart {
   height: 15px;
 }
+
+img#cart-img {
+  height: 120px;
+}
+
+#blackout-window {
+  height: 100%;
+  width: 100%;
+  left:0px;
+  top: 0px;
+  background-color: rgba(64, 64, 64, .5);
+  position: fixed;
+}
